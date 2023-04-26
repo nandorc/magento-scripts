@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# 0. Define target branch and find
+declare target_branch=master
+[ -n "${1}" ] && target_branch="${1}"
+
+# 1. Validate paths
+[ ! -d /magento-app-build ] && echo -e "ERR~ /magento-app-build folder not found" && exit 1
+[ ! -f /magento-app-build/bin/magento ] && echo -e "ERR~ No magento app at /magento-app-build folder" && exit 1
+[ ! -d /magento-app ] && echo -e "ERR~ /magento-app folder not found" && exit 1
+[ ! -f /magento-app/bin/magento ] && echo -e "ERR~ No magento app at /magento-app-build folder" && exit 1
+
+# 2. Move to build path
+cd /magento-app-build
+
+# 3. Update repository
+bin/magento maintenance:enable
+git restore .
+git fetch
+git switch "${target_branch}"
+git pull
+
+# 4. Merge for build
+git switch build
+git merge --no-ff --no-edit "${target_branch}"
+
+# 5. Update dependencies
+composer i
+git restore .
+
+# 6. Build for deploy
+bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
+if [ -n "$(git status -s)" ]; then
+  git add .
+  git commit -m "Build app at $(date)"
+fi
+bin/magento maintenance:disable
+
+# 7. Move to deploy path
+cd /magento-app-build
+
+# 8. Deploy changes
+git fetch
+bin/magento maintenance:enable
+git pull
+bin/magento app:config:import
+bin/magento setup:upgrade --keep-generated
+
+# 9. Finish
+bin/magento cache:flush
+bin/magento maintenance:disable
