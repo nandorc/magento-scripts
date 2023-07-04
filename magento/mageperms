@@ -9,6 +9,7 @@ for selected_path in "${selected_paths[@]}"; do
 done
 
 for selected_path in "${selected_paths[@]}"; do
+  echo -e "INF~ MAGEPERMS at '${selected_path}'"
   sudo chown -R -v :www-data "${selected_path}"
   sudo find "${selected_path}" -type f ! -name "*.*" ! -perm 0775 -exec chmod -v 0775 {} +
   sudo find "${selected_path}" -type f -name "*.sh" ! -perm 0775 -exec chmod -v 0775 {} +
