@@ -7,7 +7,7 @@ while [ -n "${1}" ]; do
   if [ "${1}" = "-d" ]; then
     [ -z "$(echo "${2}" | grep "^-")" ] && target_dir="${2}" && shift
   elif [ "${1}" = "-b" ]; then
-    [ -z "$(echo "${2}" | grep "^-")" ] && target_branch"${2}" && shift
+    [ -z "$(echo "${2}" | grep "^-")" ] && target_branch="${2}" && shift
   fi
   shift
 done
