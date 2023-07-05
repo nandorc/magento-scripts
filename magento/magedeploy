@@ -25,28 +25,19 @@ echo -e "INF~ MAGEDEPLOY at '${target_dir}' for branch '${target_branch}'"
 cd "${target_dir}/build"
 
 # 3. Update repository
-bin/magento maintenance:enable
-git restore .
-git fetch
-git switch "${target_branch}"
-git pull
+git restore . && git fetch
+git switch "${target_branch}" && git pull
 
 # 4. Merge for build
-git switch build
-git merge --no-ff --no-edit "${target_branch}"
+git switch build && git merge --no-ff --no-edit "${target_branch}"
 
 # 5. Update dependencies
-composer i
-git restore .
+composer i && git restore .
 
 # 6. Build for deploy
-bin/magento setup:di:compile
-bin/magento setup:static-content:deploy -f
-if [ -n "$(git status -s)" ]; then
-  git add .
-  git commit -m "Build app at $(date)"
-fi
-bin/magento maintenance:disable
+bin/magento setup:di:compile && bin/magento setup:static-content:deploy -f
+cp .gitignore-build .gitignore && git add . && git restore --staged .gitignore && git restore .gitignore
+[ -n "$(git status -s)" ] && git commit -m "Build app at $(date)"
 
 # 7. Move to site path
 cd "${target_dir}/site"
@@ -55,8 +46,7 @@ cd "${target_dir}/site"
 git fetch
 bin/magento maintenance:enable
 git pull
-bin/magento app:config:import
-bin/magento setup:upgrade --keep-generated
+bin/magento app:config:import && bin/magento setup:upgrade --keep-generated
 
 # 9. Finish
 bin/magento indexer:reindex

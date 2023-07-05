@@ -13,8 +13,9 @@ done
 
 # Set recommended configurations
 declare settings=("date.timezone=America/Bogota" "max_execution_time=120" "memory_limit=2G" "post_max_size=64M" "upload_max_filesize=64M" "max_input_time=60" "max_input_vars=3000" "realpath_cache_size=10M" "realpath_cache_ttl=7200" "opcache.save_comments=1")
-[ "${1}" = "nginx" ] && settings=("date.timezone=America/Bogota" "max_execution_time=1800" "memory_limit=2G" "post_max_size=64M" "upload_max_filesize=64M" "max_input_time=60" "max_input_vars=3000" "realpath_cache_cache_size=10M" "realpath_cache_ttl=7200" "opcache.save_comments=1" "zlib.output_compression=On")
+[ "${1}" = "nginx" ] && settings=("date.timezone=America/Bogota" "max_execution_time=1800" "memory_limit=2G" "post_max_size=64M" "upload_max_filesize=64M" "max_input_time=60" "max_input_vars=3000" "realpath_cache_size=10M" "realpath_cache_ttl=7200" "opcache.save_comments=1" "zlib.output_compression=On")
 for ini_file_dir in "${ini_file_dirs[@]}"; do
+  echo -e "INF~ STORE SETTINGS AT '${ini_file_dir}'"
   for setting in "${settings[@]}"; do
     setting=(${setting//=/ })
     current_value=$(cat "${ini_file_dir}" | grep "^${setting[0]}")
