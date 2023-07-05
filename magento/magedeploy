@@ -45,7 +45,7 @@ echo -e "\nINF~ MAGEDELIVER (5/9) All updated!\n"
 
 # 6. Build for deploy
 echo -e "\nINF~ MAGEDELIVER (6/9) Building clases and static elements...\n"
-bin/magento setup:di:compile && bin/magento setup:static-content:deploy -f
+bin/magento setup:di:compile && bin/magento setup:static-content:deploy -f es_CO en_US
 cp .gitignore-build .gitignore && git add . && git restore --staged .gitignore && git restore .gitignore
 [ -n "$(git status -s)" ] && git commit -m "Build app at $(date)"
 echo -e "\nINF~ MAGEDELIVER (6/9) Build completed!\n"
