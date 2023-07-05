@@ -14,41 +14,58 @@ done
 [ -n "$(echo "${target_dir}" | grep "/$")" ] && target_dir="${target_dir::-1}"
 
 # 1. Validate paths
+echo -e "\nINF~ MAGEDELIVER (1/9) Checking directories...\n"
 [ ! -d "${target_dir}" ] && echo -e "ERR~ target directory '${target_dir}' doesn't exists" && exit 1
 [ ! -d "${target_dir}/build" ] && echo -e "ERR~ build folder not found at '${target_dir}'" && exit 1
 [ ! -f "${target_dir}/build/bin/magento" ] && echo -e "ERR~ No magento app at '${target_dir}/build'" && exit 1
 [ ! -d "${target_dir}/site" ] && echo -e "ERR~ site folder not found at '${target_dir}'" && exit 1
 [ ! -f "${target_dir}/site/bin/magento" ] && echo -e "ERR~ No magento app at '${target_dir}/site'" && exit 1
-echo -e "INF~ MAGEDEPLOY at '${target_dir}' for branch '${target_branch}'"
+echo -e "\nINF~ MAGEDELIVER (1/9) All right at '${target_dir}' for branch '${target_branch}'\n"
 
 # 2. Move to build path
+echo -e "\nINF~ MAGEDELIVER (2/9) Moving to build directory...\n"
 cd "${target_dir}/build"
+echo -e "\nINF~ MAGEDELIVER (2/9) Ready to build!\n"
 
 # 3. Update repository
+echo -e "\nINF~ MAGEDELIVER (3/9) Updating target branch...\n"
 git restore . && git fetch
 git switch "${target_branch}" && git pull
+echo -e "\nINF~ MAGEDELIVER (3/9) All updated!\n"
 
 # 4. Merge for build
+echo -e "\nINF~ MAGEDELIVER (4/9) Updating build branch...\n"
 git switch build && git merge --no-ff --no-edit "${target_branch}"
+echo -e "\nINF~ MAGEDELIVER (4/9) All updated!\n"
 
 # 5. Update dependencies
+echo -e "\nINF~ MAGEDELIVER (5/9) Updating dependencies...\n"
 composer i && git restore .
+echo -e "\nINF~ MAGEDELIVER (5/9) All updated!\n"
 
 # 6. Build for deploy
+echo -e "\nINF~ MAGEDELIVER (6/9) Building clases and static elements...\n"
 bin/magento setup:di:compile && bin/magento setup:static-content:deploy -f
 cp .gitignore-build .gitignore && git add . && git restore --staged .gitignore && git restore .gitignore
 [ -n "$(git status -s)" ] && git commit -m "Build app at $(date)"
+echo -e "\nINF~ MAGEDELIVER (6/9) Build completed!\n"
 
 # 7. Move to site path
+echo -e "\nINF~ MAGEDELIVER (7/9) Moving to site directory...\n"
 cd "${target_dir}/site"
+echo -e "\nINF~ MAGEDELIVER (7/9) Ready to deploy!\n"
 
 # 8. Deploy changes
+echo -e "\nINF~ MAGEDELIVER (8/9) Deploying changes...\n"
 git fetch
 bin/magento maintenance:enable
 git pull
 bin/magento app:config:import && bin/magento setup:upgrade --keep-generated
+echo -e "\nINF~ MAGEDELIVER (8/9) All done!\n"
 
 # 9. Finish
+echo -e "\nINF~ MAGEDELIVER (9/9) Executing last task...\n"
 bin/magento indexer:reindex
 bin/magento cache:flush
 bin/magento maintenance:disable
+echo -e "\nINF~ MAGEDELIVER (9/9) All done!\n"
