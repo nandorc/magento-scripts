@@ -14,7 +14,7 @@
           {
             "foreground": "#557EE6",
             "style": "plain",
-            "template": "{{ .UserName }} on",
+            "template": "{{ if .UserName }}{{ .UserName }} on{{ end }}",
             "type": "session"
           },
           {
