@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# git styles
-[ -f ~/.bash_gitrc ] && source ~/.bash_gitrc
+# oh-my-posh
+eval "$(oh-my-posh init bash --config ~/theme.omp.json)"
